@@ -1,5 +1,7 @@
 //  file and import express
 const express = require('express');
+//  import the module  to prompt for a different user request with a JSON object
+const inputCheck = require('./utils/inputCheck');
 // import sqlite3 pkg from node_modules
 //  sets the execution mode to verbose to produce messages in the terminal regarding the state of the runtime
 const sqlite3 = require('sqlite3').verbose();
@@ -68,6 +70,36 @@ app.delete('/api/candidate/:id', (req, res) => {
       changes: this.changes
     });
   });
+});
+
+// Create a candidate
+// use the HTTP request method post() to insert a candidate into the candidates table12.2.7
+app.post('/api/candidate', ({ body }, res) => {
+  //  ***Notice that we're using object destructuring to pull the body property out of the request object.***
+  const errors = inputCheck(body, 'first_name', 'last_name', 'industry_connected');
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+
+  //  database call
+  const sql = `INSERT INTO candidates (first_name, last_name, industry_connected) 
+  VALUES (?,?,?)`;
+const params = [body.first_name, body.last_name, body.industry_connected];
+// ES5 function, not arrow function, to use `this`
+db.run(sql, params, function(err, result) {
+if (err) {
+res.status(400).json({ error: err.message });
+return;
+}
+
+res.json({
+message: 'success',
+data: body,
+id: this.lastID
+});
+});
+
 });
 
 // callback function captures the responses from the query in two variables: the err, which is the error response, and rows, which is the database query response
