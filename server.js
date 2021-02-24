@@ -5,10 +5,12 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 // Add the PORT designation and the app expression
 const PORT = process.env.PORT || 3001;
-const app =express();
+const app = express();
 
 // Express middleware
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({
+  extended: false
+}));
 app.use(express.json());
 
 //  connect the application to the SQLite database
@@ -25,6 +27,81 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Hello World'
   });
+});
+
+// Get single candidate
+app.get('/api/candidate/:id', (req, res) => {
+  const sql = `SELECT * FROM candidates 
+               WHERE id = ?`;
+  //  Because params can be accepted in the database call as an array, params is assigned as an array with a single element, req.params.id.12.2.5
+  const params = [req.params.id];
+  // using the Database method get() to return a single row from the database call 12.2.5
+  db.get(sql, params, (err, row) => {
+    if (err) {
+      //  error status code was changed to 400 to notify the client that their request wasn't accepted and to try a different request.
+      res.status(400).json({
+        error: err.message
+      });
+      return;
+    }
+
+    res.json({
+      message: 'success',
+      data: row
+    });
+  });
+});
+
+// Delete a candidate  (?) denotes a placeholder, making this a prepared statement. Prepared statements can have placeholders that can be filled in dynamically with real values12.2.4
+// Delete a candidate 12.2.6
+app.delete('/api/candidate/:id', (req, res) => {
+  const sql = `DELETE FROM candidates WHERE id = ?`;
+  const params = [req.params.id];
+  db.run(sql, params, function(err, result) {
+    if (err) {
+      res.status(400).json({ error: res.message });
+      return;
+    }
+
+    res.json({
+      message: 'successfully deleted',
+      changes: this.changes
+    });
+  });
+});
+
+// callback function captures the responses from the query in two variables: the err, which is the error response, and rows, which is the database query response
+
+// Get all candidates the api in the URL signifies that this is an API endpoint.
+// app.get('/api/candidates', (req, res) => {
+//   const sql = `SELECT * FROM candidates`;
+//   const params = [];
+//   db.all(sql, params, (err, rows) => {
+//     if (err) {
+//       // 500 status code means there was a server error—different than a 404,
+//       res.status(500).json({
+//         error: err.message
+//       });
+//       return;
+//     }
+
+//     res.json({
+//       message: 'success',
+//       data: rows
+//     });
+//   });
+// });
+
+// Create a candidate
+const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
+              VALUES (?,?,?,?)`;
+const params = [1, 'Ronald', 'Firbank', 1];
+// ES5 function, not arrow function, to use this
+db.run(sql, params, function(err, result) {
+  if (err) {
+    console.log(err);
+  }
+  console.log(result, this.lastID);
 });
 
 // Default response for any other request(Not Found) Catch all
