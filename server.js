@@ -81,18 +81,19 @@ app.post('/api/candidate', ({ body }, res) => {
     res.status(400).json({ error: errors });
     return;
   }
-
-  //  database call
+  //  database call 12.2.7
   const sql = `INSERT INTO candidates (first_name, last_name, industry_connected) 
   VALUES (?,?,?)`;
 const params = [body.first_name, body.last_name, body.industry_connected];
 // ES5 function, not arrow function, to use `this`
+//  no column for the id. SQLite will autogenerate the id 12.2.7
 db.run(sql, params, function(err, result) {
 if (err) {
+  // 400 status code, to prompt for a different user request
 res.status(400).json({ error: err.message });
 return;
 }
-
+//  send the response using the res.json() method with this.lastID, the id of the inserted row 12.2.7
 res.json({
 message: 'success',
 data: body,
