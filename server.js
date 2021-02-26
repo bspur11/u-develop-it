@@ -106,36 +106,36 @@ id: this.lastID
 // callback function captures the responses from the query in two variables: the err, which is the error response, and rows, which is the database query response
 
 // Get all candidates the api in the URL signifies that this is an API endpoint.
-// app.get('/api/candidates', (req, res) => {
-//   const sql = `SELECT * FROM candidates`;
-//   const params = [];
-//   db.all(sql, params, (err, rows) => {
-//     if (err) {
-//       // 500 status code means there was a server error—different than a 404,
-//       res.status(500).json({
-//         error: err.message
-//       });
-//       return;
-//     }
+app.get('/api/candidates', (req, res) => {
+  const sql = `SELECT * FROM candidates`;
+  const params = [];
+  db.all(sql, params, (err, rows) => {
+    if (err) {
+      // 500 status code means there was a server error—different than a 404,
+      res.status(500).json({
+        error: err.message
+      });
+      return;
+    }
 
-//     res.json({
-//       message: 'success',
-//       data: rows
-//     });
-//   });
-// });
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+});
 
 // Create a candidate
-const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
-              VALUES (?,?,?,?)`;
-const params = [1, 'Ronald', 'Firbank', 1];
-// ES5 function, not arrow function, to use this
-db.run(sql, params, function(err, result) {
-  if (err) {
-    console.log(err);
-  }
-  console.log(result, this.lastID);
-});
+// const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
+//               VALUES (?,?,?,?)`;
+// const params = [1, 'Ronald', 'Firbank', 1];
+// // ES5 function, not arrow function, to use this
+// db.run(sql, params, function(err, result) {
+//   if (err) {
+//     console.log(err);
+//   }
+//   console.log(result, this.lastID);
+// });
 
 // Default response for any other request(Not Found) Catch all
 //  catchall route, its placement is very important
